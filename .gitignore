@@ -1,0 +1,27 @@
+# Environment & Secrets
+.env
+*.env
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# Application outputs (generated at runtime)
+outputs/*.png
+logs/app.log
+logs/sessions/
+
+# Data (large files, regenerated via ingest.py)
+data/*.duckdb
+data/*.csv
+
+# OS
+.DS_Store
+Thumbs.db

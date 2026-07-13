@@ -1,0 +1,9 @@
+{
+    "venvPath": "C:\\Users\\hruth\\Downloads\\Github\\NullAxis Assignment\\Solution",
+    "venv": "venv",
+    "pythonVersion": "3.11",
+    "extraPaths": ["src"],
+    "typeCheckingMode": "off",
+    "useLibraryCodeForTypes": true,
+    "reportMissingModuleSource": "none"
+}
