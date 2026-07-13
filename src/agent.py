@@ -41,14 +41,11 @@ if not logger.handlers:
     )
     os.makedirs(os.path.dirname(_log_path), exist_ok=True)
     _handler_file = logging.FileHandler(_log_path, encoding="utf-8")
-    _handler_stream = logging.StreamHandler()
     _fmt = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s — %(message)s")
     _handler_file.setFormatter(_fmt)
-    _handler_stream.setFormatter(_fmt)
     logger.setLevel(logging.INFO)
     logger.addHandler(_handler_file)
-    logger.addHandler(_handler_stream)
-    logger.propagate = False  # prevent root-logger duplication
+    logger.propagate = True
 
 
 # ---------------------------------------------------------------------------

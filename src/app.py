@@ -33,14 +33,11 @@ if not logger.handlers:
     )
     os.makedirs(os.path.dirname(_log_path), exist_ok=True)
     _h_file = logging.FileHandler(_log_path, encoding="utf-8")
-    _h_stream = logging.StreamHandler()
     _fmt = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s — %(message)s")
     _h_file.setFormatter(_fmt)
-    _h_stream.setFormatter(_fmt)
     logger.setLevel(logging.INFO)
     logger.addHandler(_h_file)
-    logger.addHandler(_h_stream)
-    logger.propagate = False
+    logger.propagate = True
 
 # ---------------------------------------------------------------------------
 # Page config (must be first Streamlit call)
