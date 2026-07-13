@@ -55,25 +55,56 @@ st.set_page_config(
 st.markdown(
     """
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        
+        /* Apply font globally */
+        html, body, [class*="css"] {
+            font-family: 'Inter', sans-serif !important;
+        }
+        
         /* Gradient title */
         h1 {
-            background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
+            background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: 800;
             margin-bottom: 1rem;
+            letter-spacing: -1px;
         }
-        /* Chat bubbles */
+        
+        h2, h3 {
+            color: #1e293b;
+            font-weight: 700 !important;
+            letter-spacing: -0.5px;
+        }
+        
+        /* Modern chat bubbles */
         .stChatMessage {
-            border-radius: 12px;
-            padding: 14px 18px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(0,0,0,0.05);
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        /* Sidebar metric labels */
-        [data-testid="stMetricLabel"] { font-size: 0.78rem; }
+        
+        .stChatMessage:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+        
         /* Code blocks inside expanders */
-        .stExpander pre { font-size: 0.8rem; }
+        .stExpander pre { 
+            font-size: 0.85rem; 
+            border-radius: 8px;
+        }
+        
+        /* Style the st.info and st.error alerts to be less harsh */
+        .stAlert {
+            border-radius: 12px;
+            border: none;
+        }
     </style>
     """,
     unsafe_allow_html=True,
@@ -109,8 +140,10 @@ _OUTPUTS_DIR = os.path.normpath(
     os.path.join(os.path.dirname(__file__), "..", "outputs")
 )
 _CURRENT_PLOT = os.path.join(_OUTPUTS_DIR, "current_plot.png")
-_IN_RATE = 0.14   # $/1 M input tokens  (deepseek-chat, July 2025)
-_OUT_RATE = 0.28  # $/1 M output tokens
+
+# Allow dynamic pricing from env, but default to DeepSeek July 2025 rates
+_IN_RATE = float(os.environ.get("DEEPSEEK_IN_RATE", "0.14"))
+_OUT_RATE = float(os.environ.get("DEEPSEEK_OUT_RATE", "0.28"))
 
 os.makedirs(_HISTORY_DIR, exist_ok=True)
 os.makedirs(_OUTPUTS_DIR, exist_ok=True)
@@ -225,11 +258,35 @@ def _render_cost() -> None:
         (st.session_state.total_input_tokens / 1_000_000) * _IN_RATE
         + (st.session_state.total_output_tokens / 1_000_000) * _OUT_RATE
     )
+    
+    # Premium gradient dashboard card for cost metrics
+    html = f"""
+    <div style="
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        padding: 24px;
+        border-radius: 16px;
+        color: white;
+        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        border: 1px solid rgba(255,255,255,0.1);
+    ">
+        <div style="font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; margin-bottom: 8px;">Session Cost</div>
+        <div style="font-size: 36px; font-weight: 800; margin-bottom: 24px; color: #f8fafc; letter-spacing: -1px;">${cost:.5f}</div>
+        
+        <div style="display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px;">
+            <div>
+                <div style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 4px;">Input Tokens</div>
+                <div style="font-size: 18px; font-weight: 700; color: #e2e8f0;">{st.session_state.total_input_tokens:,}</div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 4px;">Output Tokens</div>
+                <div style="font-size: 18px; font-weight: 700; color: #e2e8f0;">{st.session_state.total_output_tokens:,}</div>
+            </div>
+        </div>
+    </div>
+    """
     with _cost_placeholder.container():
-        col1, col2 = st.columns(2)
-        col1.metric("Input Tokens", f"{st.session_state.total_input_tokens:,}")
-        col2.metric("Output Tokens", f"{st.session_state.total_output_tokens:,}")
-        st.metric("Session Cost", f"${cost:.5f}")
+        st.markdown(html, unsafe_allow_html=True)
 
 
 _render_cost()
