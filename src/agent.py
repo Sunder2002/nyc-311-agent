@@ -128,6 +128,7 @@ SQL RULES — follow these precisely:
   5. CAST latitude/longitude to DOUBLE before numeric operations.
   6. Always alias computed columns: COUNT(*) AS total, AVG(...) AS avg_days.
   7. Use LIMIT to keep result sets manageable (≤ 20 rows for charts).
+  8. For conditional aggregations, ALWAYS use standard SQL: SUM(CASE WHEN condition THEN 1 ELSE 0 END). Do not use COUNT(CASE...).
 
 WORKFLOW
   Step 1 — Execute a SQL query with execute_sql_query.
