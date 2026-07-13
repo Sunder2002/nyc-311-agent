@@ -102,8 +102,8 @@ def generate_visualization(
     Args:
         query:      A SQL SELECT that returns the data to plot.
         chart_type: One of 'bar', 'horizontal_bar', 'line', 'scatter', 'pie'.
-        x_col:      Column name for the X-axis (or pie labels).
-        y_col:      Column name for the Y-axis (or pie values).
+        x_col:      Column name for the X-axis (numeric length for horizontal_bar, or pie labels).
+        y_col:      Column name for the Y-axis (categorical labels for horizontal_bar, or pie values).
         title:      Human-readable chart title.
 
     Returns:
@@ -145,21 +145,9 @@ def generate_visualization(
             plt.xticks(rotation=45, ha="right")
 
         elif ct == "horizontal_bar":
-            import pandas.api.types as ptypes
-            # Dynamically determine the numeric column to prevent double-swapping
-            if ptypes.is_numeric_dtype(df[x_col]) and not ptypes.is_numeric_dtype(df[y_col]):
-                sns.barplot(data=df, x=x_col, y=y_col, orient="h", ax=ax)
-                ax.set_xlabel(x_col)
-                ax.set_ylabel(y_col)
-            elif ptypes.is_numeric_dtype(df[y_col]) and not ptypes.is_numeric_dtype(df[x_col]):
-                sns.barplot(data=df, x=y_col, y=x_col, orient="h", ax=ax)
-                ax.set_xlabel(y_col)
-                ax.set_ylabel(x_col)
-            else:
-                # Fallback
-                sns.barplot(data=df, x=x_col, y=y_col, orient="h", ax=ax)
-                ax.set_xlabel(x_col)
-                ax.set_ylabel(y_col)
+            sns.barplot(data=df, x=x_col, y=y_col, orient="h", ax=ax)
+            ax.set_xlabel(x_col)
+            ax.set_ylabel(y_col)
 
         elif ct == "line":
             sns.lineplot(data=df, x=x_col, y=y_col, ax=ax, marker="o")
