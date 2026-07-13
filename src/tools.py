@@ -145,9 +145,21 @@ def generate_visualization(
             plt.xticks(rotation=45, ha="right")
 
         elif ct == "horizontal_bar":
-            sns.barplot(data=df, x=y_col, y=x_col, orient="h", ax=ax)
-            ax.set_xlabel(y_col)
-            ax.set_ylabel(x_col)
+            import pandas.api.types as ptypes
+            # Dynamically determine the numeric column to prevent double-swapping
+            if ptypes.is_numeric_dtype(df[x_col]) and not ptypes.is_numeric_dtype(df[y_col]):
+                sns.barplot(data=df, x=x_col, y=y_col, orient="h", ax=ax)
+                ax.set_xlabel(x_col)
+                ax.set_ylabel(y_col)
+            elif ptypes.is_numeric_dtype(df[y_col]) and not ptypes.is_numeric_dtype(df[x_col]):
+                sns.barplot(data=df, x=y_col, y=x_col, orient="h", ax=ax)
+                ax.set_xlabel(y_col)
+                ax.set_ylabel(x_col)
+            else:
+                # Fallback
+                sns.barplot(data=df, x=x_col, y=y_col, orient="h", ax=ax)
+                ax.set_xlabel(x_col)
+                ax.set_ylabel(y_col)
 
         elif ct == "line":
             sns.lineplot(data=df, x=x_col, y=y_col, ax=ax, marker="o")
